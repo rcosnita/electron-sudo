@@ -152,12 +152,14 @@ class SudoerDarwin extends SudoerUnix {
     async spawn(command, args, options={}) {
         return new Promise(async (resolve, reject) => {
             let self = this,
-                bin = '/usr/bin/sudo',
+                bin = "/usr/bin/osascript",
+                rm = "/bin/rm",
+                outputFile = "output_tmp_12341232.txt",
                 cp;
             await self.reset();
-            // Prompt password
-            await self.prompt();
-            cp = spawn(bin, ['-n', '-s', '-E', [command, ...args].join(' ')], options);
+            const rmCmd = [rm, '-f', outputFile].join(' ');
+            const argStr = '\'do shell script "' + rmCmd + " && " + [command, ...args].join(' ') + " >> " + outputFile + "\" with administrator privileges'";
+            cp = spawn(bin, ["-e", argStr], options);
             cp.on('error', async (err) => {
                 reject(err);
             });

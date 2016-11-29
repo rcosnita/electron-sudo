@@ -26,6 +26,7 @@ async function exec(cmd, options={}) {
 }
 
 function spawn(cmd, args, options={}) {
+    const outputFile = "output_tmp_12341232.txt";
     let cp = child.spawn(cmd, args, {...options, shell: true});
     cp.output = { stdout: new Buffer(0), stderr: new Buffer(0) };
     cp.stdout.on('data', (data) => {
@@ -33,6 +34,14 @@ function spawn(cmd, args, options={}) {
     });
     cp.stderr.on('data', (data) => {
         cp.output.stderr = concat(data, cp.output.stderr);
+    });
+    cp.stdout.on('end', () => {
+        if (!fs.existsSync(outputFile)) {
+            return;
+        }
+
+        cp.output.stdout = fs.readFileSync(outputFile).toString();
+        fs.unlinkSync(outputFile);
     });
     return cp;
 }
