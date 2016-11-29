@@ -41,7 +41,6 @@ function spawn(cmd, args, options={}) {
         }
 
         cp.output.stdout = fs.readFileSync(outputFile).toString();
-        fs.unlinkSync(outputFile);
     });
     return cp;
 }
